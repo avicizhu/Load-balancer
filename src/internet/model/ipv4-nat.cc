@@ -38,13 +38,19 @@
 #include "ipv4-nat.h"
 #include "ipv4.h"
 
-
+#include <time.h>
 #include <iomanip>
+#include <algorithm>
 
 NS_LOG_COMPONENT_DEFINE ("Ipv4Nat");
 
+
 namespace ns3 {
 std::map <uint32_t, int> Ipv4Nat::mapServer;
+std::map <uint32_t, int>::iterator Ipv4Nat::m_Iter;
+int Ipv4Nat::weight = 5;
+std::string Ipv4Nat::algo = "rr";
+
 //int k=0;
 Ipv4NetfilterHook natCallback1;
 Ipv4NetfilterHook natCallback2;
@@ -54,9 +60,7 @@ NS_OBJECT_ENSURE_REGISTERED (Ipv4Nat);
 TypeId
 Ipv4Nat::GetTypeId (void)
 {
-  static TypeId tId = TypeId ("ns3::Ipv4Nat")
-    .SetParent<Object> ()
-  ;
+  static TypeId tId = TypeId ("ns3::Ipv4Nat").SetParent<Object> ();
 
   return tId;
 }
@@ -68,7 +72,8 @@ Ipv4Nat::Ipv4Nat ()
   NS_LOG_FUNCTION (this);
  
   Ipv4Nat::initServer();
-
+//  srand (time(NULL));
+  srand (10);
   NetfilterHookCallback doNatPreRouting = MakeCallback (&Ipv4Nat::DoNatPreRouting, this);
   NetfilterHookCallback doNatPostRouting = MakeCallback (&Ipv4Nat::DoNatPostRouting, this);
 
@@ -83,14 +88,14 @@ mapServer[Ipv4Address ("192.168.1.2").Get()] = 0;
 mapServer[Ipv4Address ("192.168.1.3").Get()] = 0;
 mapServer[Ipv4Address ("192.168.1.4").Get()] = 0;
 mapServer[Ipv4Address ("192.168.1.5").Get()] = 0;
-mapServer[Ipv4Address ("192.168.1.6").Get()] = 0;
+/*mapServer[Ipv4Address ("192.168.1.6").Get()] = 0;
 mapServer[Ipv4Address ("192.168.1.7").Get()] = 0;
 mapServer[Ipv4Address ("192.168.1.8").Get()] = 0;
 mapServer[Ipv4Address ("192.168.1.9").Get()] = 0;
 mapServer[Ipv4Address ("192.168.1.10").Get()] = 0;
 mapServer[Ipv4Address ("192.168.1.11").Get()] = 0;
 mapServer[Ipv4Address ("192.168.1.12").Get()] = 0;
-/*mapServer[Ipv4Address ("192.168.1.13").Get()] = 0;
+mapServer[Ipv4Address ("192.168.1.13").Get()] = 0;
 mapServer[Ipv4Address ("192.168.1.14").Get()] = 0;
 mapServer[Ipv4Address ("192.168.1.15").Get()] = 0;
 mapServer[Ipv4Address ("192.168.1.16").Get()] = 0;
@@ -128,6 +133,7 @@ mapServer[Ipv4Address ("192.168.1.47").Get()] = 0;
 mapServer[Ipv4Address ("192.168.1.48").Get()] = 0;
 mapServer[Ipv4Address ("192.168.1.49").Get()] = 0;
 */
+m_Iter = mapServer.begin();
 }
 
 void Ipv4Nat::setServerStatus(uint32_t ip,int change){
@@ -148,7 +154,7 @@ void Ipv4Nat::setServerStatus(uint32_t ip,int change){
 	}
 }
 
-uint32_t Ipv4Nat::findLeastConn(){
+uint32_t Ipv4Nat::getLeastConn(){
 	uint32_t ip;
 	int min;
 	min = mapServer[mapServer.begin()->first];
@@ -161,15 +167,65 @@ uint32_t Ipv4Nat::findLeastConn(){
 		ip = iter->first;
 		}
 	}
-// uncomment to use Round Robin
-/*	std::map<uint32_t, int>::iterator iter = mapServer.begin();
-	if(k>47){k=0;}else{k++;}
-	for(int i=0;i<k;i++){
-	++iter;
-	}
-	ip = iter->first;
-*/	
 	return ip;
+}
+
+uint32_t Ipv4Nat::getWeightLeastConn(){
+	uint32_t ip;
+	int min;
+	min = mapServer[mapServer.begin()->first];
+	ip = mapServer.begin()->first;
+	
+	for (std::map<uint32_t, int>::iterator iter = mapServer.begin(); iter != mapServer.end(); ++iter)
+	{
+	std::map<uint32_t, int>::iterator tmp = iter;
+	tmp++;
+		if( tmp == mapServer.end() ){
+			if(mapServer[iter->first]/weight < min){
+				min = mapServer[iter->first]/weight;
+				ip = iter->first;
+			}
+		}
+		else if(mapServer[iter->first] < min){
+		min = mapServer[iter->first];
+		ip = iter->first;
+		}
+	}
+	return ip;
+}
+
+uint32_t Ipv4Nat::getRandomConn(){
+        std::map<uint32_t, int>::iterator it = mapServer.begin();
+        std::advance(it, rand() % mapServer.size());
+        return it->first;
+}
+
+uint32_t Ipv4Nat::getNextConn(){
+        if(m_Iter==mapServer.end())
+            m_Iter=mapServer.begin();
+        uint32_t ip = m_Iter->first;
+        m_Iter++;
+        return ip;
+}
+
+uint32_t Ipv4Nat::getWeightNextConn(){
+        if(m_Iter==mapServer.end())
+            m_Iter=mapServer.begin();
+        uint32_t ip = m_Iter->first;
+        std::map<uint32_t, int>::iterator tmp = m_Iter;
+	tmp++;
+
+	if( tmp != mapServer.end() ){
+	m_Iter++;
+	}else{
+		if(weight != 1){
+			weight--;	
+		}else if(weight == 1){
+			weight = 5;
+			m_Iter++;
+		}
+	}
+        return ip;
 }
 
 void Ipv4Nat::addingNatRules(Ptr<Ipv4Nat> nat){
@@ -484,7 +540,18 @@ Ipv4Nat::DoNatPreRouting (Hooks_t hookNumber, Ptr<Packet> p,
 	}
 	//only new request go to this point
 	uint32_t serverIP = 0;
-	serverIP = Ipv4Nat::findLeastConn();
+        std::transform(algo.begin(), algo.end(), algo.begin(), ::toupper);
+        if(algo=="RR")
+            serverIP = getNextConn();
+        else if (algo == "LC")
+            serverIP = getLeastConn();
+        else if(algo == "WLC")
+	    serverIP = getWeightLeastConn();
+	else if(algo == "WRR")
+	    serverIP = getWeightNextConn();
+	else
+            serverIP = getRandomConn();
+
 	Ipv4Nat::setServerStatus( Ipv4Address(serverIP).Get(), 1 );
         StaticNatRules::const_iterator i = m_statictable.begin (); 
 	for ( i = m_statictable.begin (); i != m_statictable.end (); i++){

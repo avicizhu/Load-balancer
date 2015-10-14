@@ -324,9 +324,14 @@ public:
   
   void initServer ();
   static void setServerStatus(uint32_t ip,int change);
-  static uint32_t findLeastConn();
+  static uint32_t getLeastConn();
+  static uint32_t getWeightLeastConn();
+  static uint32_t getRandomConn();
+  static uint32_t getNextConn();
+  static uint32_t getWeightNextConn();
   static void addingNatRules(Ptr<Ipv4Nat> nat);
-
+  static std::string algo;
+  static int weight;
 protected:
   // from Object base class
   virtual void NotifyNewAggregate (void);
@@ -334,6 +339,7 @@ protected:
 private:
 
   static std::map <uint32_t, int> mapServer; 
+  static std::map <uint32_t, int>::iterator m_Iter; 
 //mapServer.insert (pair<uint32_t, int>(Ipv4Address ("192.168.1.2").Get(), 0) );
 
   //bool m_isConnected;

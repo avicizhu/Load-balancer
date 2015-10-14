@@ -28,15 +28,23 @@ for(int i = 0; i < 48; i++){
   stringstream filename;
   stringstream socketname;  
   filename << "lb-server-" << i << ".cwnd";
-  socketname << "/NodeList/1/$ns3::TcpL4Protocol/SocketList/" << i << "/CongestionWindow";
+  socketname << "/NodeList/1/$ns3::TcpL4Protocol/SocketList/"<< i <<"/CongestionWindow";
   Ptr<OutputStreamWrapper> stream = ascii.CreateFileStream (filename.str());
   Config::ConnectWithoutContext ( socketname.str(), MakeBoundCallback (&CwndChange,stream));
 }
 }
 
+
 int
 main (int argc, char *argv[])
 {
+
+
+    CommandLine cmd;
+    cmd.AddValue("algo", "Algorithm to select next server", Ipv4Nat::algo);
+    cmd.Parse (argc, argv);
+    std::cout << "Using LB ALGO: " << Ipv4Nat::algo << std::endl;
+
 //  LogComponentEnable ("DropTailQueue", LOG_LEVEL_LOGIC);
     LogComponentEnable ("Ipv4Nat", LOG_LEVEL_WARN);
 //  LogComponentEnable ("UdpServer", LOG_LEVEL_INFO);
@@ -141,55 +149,64 @@ main (int argc, char *argv[])
 #else
   BulkSendHelper clientHelper ("ns3::TcpSocketFactory", Address (InetSocketAddress(csmaInterfaces.GetAddress (1), 80)));
 #endif
-  clientHelper.SetAttribute ("MaxBytes", UintegerValue (655350));
+  //clientHelper.SetAttribute ("MaxBytes", UintegerValue (1048576));
+  clientHelper.SetAttribute ("MaxBytes", UintegerValue (204800));
   // Set the segment size
   clientHelper.SetAttribute ("SendSize", UintegerValue (10000));  
-  
-  ApplicationContainer clientAppsc;
-  for(int i = 0; i < 48; i++){
-  clientAppsc.Add (clientHelper.Install (p2pNodes.Get (1)));
+  float time = 1.0;  
+  ApplicationContainer clientApps;
+  for(int i = 0; i < 36; i++){
+  clientApps.Add (clientHelper.Install (p2pNodes.Get (1)) );
+  Ptr< Application > client = clientApps.Get(i);
+  client->SetStartTime(Seconds (time));
+  client->SetStopTime(Seconds (100.0));
+  time = time + 0.001;
   }
-  clientAppsc.Start (Seconds (1.0));
-  clientAppsc.Stop (Seconds (20));
-/*
-  ApplicationContainer clientAppsb;
-  clientAppsb.Add (clientHelper.Install (p2pNodes.Get (1)));
-  clientAppsb.Add (clientHelper.Install (p2pNodes.Get (1)));
-  clientAppsb.Add (clientHelper.Install (p2pNodes.Get (1)));
-  clientAppsb.Add (clientHelper.Install (p2pNodes.Get (1)));
-  clientAppsb.Add (clientHelper.Install (p2pNodes.Get (1)));
-  clientAppsb.Add (clientHelper.Install (p2pNodes.Get (1)));
-  clientAppsb.Add (clientHelper.Install (p2pNodes.Get (1)));
-  clientAppsb.Add (clientHelper.Install (p2pNodes.Get (1)));
-  clientAppsb.Start (Seconds (1.0));
-  clientAppsb.Stop (Seconds (20));
   
+  float time1 = 1.5;  
   ApplicationContainer clientApps1;
-  for(int i = 0; i < 10; i++){
-  clientApps1.Add (clientHelper.Install (p2pNodes.Get (1)));
-  clientApps1.Add (clientHelper.Install (p2pNodes.Get (1)));
+  for(int i = 0; i < 36; i++){
+  clientApps1.Add (clientHelper.Install (p2pNodes.Get (1)) );
+  Ptr< Application > client = clientApps1.Get(i);
+  client->SetStartTime(Seconds (time1));
+  client->SetStopTime(Seconds (100.0));
+  time1 = time1 + 0.001;
   }
-  clientApps1.Start (Seconds (1.0));
-  clientApps1.Stop (Seconds (20));
-
-*/
+ 
+  float time2 = 2.0;  
+  ApplicationContainer clientApps2;
+  for(int i = 0; i < 36; i++){
+  clientApps2.Add (clientHelper.Install (p2pNodes.Get (1)) );
+  Ptr< Application > client = clientApps2.Get(i);
+  client->SetStartTime(Seconds (time2));
+  client->SetStopTime(Seconds (100.0));
+  time2 = time2 + 0.001;
+  }
+  
+  float time3 = 2.5;  
+  ApplicationContainer clientApps3;
+  for(int i = 0; i < 36; i++){
+  clientApps3.Add (clientHelper.Install (p2pNodes.Get (1)) );
+  Ptr< Application > client = clientApps3.Get(i);
+  client->SetStartTime(Seconds (time3));
+  client->SetStopTime(Seconds (100.0));
+  time3 = time3 + 0.001;
+  }
 
   PacketSinkHelper sink ("ns3::TcpSocketFactory",
         InetSocketAddress (Ipv4Address::GetAny (), 80));
   
   ApplicationContainer sinkApps = sink.Install (ServerRack1.Get (0));
-  sinkApps.Start (Seconds (0.0));
-  sinkApps.Stop (Seconds (20.0));
   for(int i = 1; i < 48; i++){
   sinkApps = sink.Install (ServerRack1.Get (i));
-  sinkApps.Start (Seconds (0.0));
-  sinkApps.Stop (Seconds (20.0));
   }
+  sinkApps.Start (Seconds (0.0));
+  sinkApps.Stop (Seconds (100.0));
  
   UdpEchoServerHelper LBServer (9);
   ApplicationContainer serverAppsLB = LBServer.Install (p2pNodes.Get (0));
   serverAppsLB.Start (Seconds (0.0));
-  serverAppsLB.Stop (Seconds (20.0));
+  serverAppsLB.Stop (Seconds (100.0));
  
 /*
   ApplicationContainer clientApps = echoClient.Install (p2pNodes.Get (1));
@@ -204,9 +221,9 @@ main (int argc, char *argv[])
   pointToPoint.EnablePcapAll ("lb-p2p", false);
   csma.EnablePcapAll("lb-lan",false);
 
-  Simulator::Schedule(Seconds(1.00001),&TraceCwnd);
+  Simulator::Schedule(Seconds(1.1),&TraceCwnd);
 
-  Simulator::Stop (Seconds (20.0));
+  Simulator::Stop (Seconds (100.0));
   Simulator::Run ();
   Simulator::Destroy ();
 }

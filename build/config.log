@@ -1,4 +1,4 @@
-# project ns (3-dev) configured on Wed Jul 22 14:55:11 2015 by
+# project ns (3-dev) configured on Fri Jul 24 21:37:55 2015 by
 # waf 1.6.11 (abi 98, python 20708f0 on linux2)
 # using ./waf configure build
 #
@@ -100,7 +100,7 @@ from /home/rich/ns-3-allinone/ns-3-lb-48/bindings/python: Test does not build: T
     raise Errors.BuildError(self.producer.error)
 BuildError: Build failed
  -> task in 'testprog' failed (exit status 1): 
-	{task 139705016344784: cxxprogram test.cpp.1.o -> testprog}
+	{task 139900347150544: cxxprogram test.cpp.1.o -> testprog}
 ['/usr/bin/g++', '-Wl,-Bsymbolic-functions', '-Wl,-z,relro', 'test.cpp.1.o', '-o', '/home/rich/ns-3-allinone/ns-3-lb-48/build/.conf_check_9a1d0551212c9d703363e62dfbc51c79/testbuild/testprog', '-Wl,-Bstatic', '-Wl,-Bdynamic', '-L/usr/lib', '-lpython2.7']
 
 not found
@@ -168,7 +168,7 @@ from /home/rich/ns-3-allinone/ns-3-lb-48/bindings/python: Test does not build: T
     raise Errors.BuildError(self.producer.error)
 BuildError: Build failed
  -> task in 'testprog' failed (exit status 1): 
-	{task 139705016489104: cxx test.cpp -> test.cpp.1.o}
+	{task 139900347294864: cxx test.cpp -> test.cpp.1.o}
 ['/usr/bin/g++', '-O0', '-ggdb', '-g3', '-Wall', '-Werror', '-fno-strict-aliasing', '-fwrapv', '-fstack-protector-strong', '-fno-strict-aliasing', '-I/usr/include/python2.7', '-DNS3_ASSERT_ENABLE', '-DNS3_LOG_ENABLE', '-DPYTHONDIR="/usr/local/lib/python2.7/dist-packages"', '-DPYTHONARCHDIR="/usr/local/lib/python2.7/dist-packages"', '-DNDEBUG', '-D_FORTIFY_SOURCE=2', '../test.cpp', '-c', '-o', 'test.cpp.1.o']
 
 Could not find the python development headers
@@ -234,7 +234,7 @@ from /home/rich/ns-3-allinone/ns-3-lb-48/src/core: Test does not build: Tracebac
     raise Errors.BuildError(self.producer.error)
 BuildError: Build failed
  -> task in 'testprog' failed (exit status 1): 
-	{task 139705016960400: cxx test.cpp -> test.cpp.1.o}
+	{task 139900347504016: cxx test.cpp -> test.cpp.1.o}
 ['/usr/bin/g++', '-O0', '-ggdb', '-g3', '-Wall', '-Werror', '-DNS3_ASSERT_ENABLE', '-DNS3_LOG_ENABLE', '../test.cpp', '-c', '-o', 'test.cpp.1.o']
 
 not found
@@ -319,7 +319,7 @@ from /home/rich/ns-3-allinone/ns-3-lb-48/src/core: Test does not build: Tracebac
     raise Errors.BuildError(self.producer.error)
 BuildError: Build failed
  -> task in 'testprog' failed (exit status 1): 
-	{task 139705016488656: cxx test.cpp -> test.cpp.1.o}
+	{task 139900347294416: cxx test.cpp -> test.cpp.1.o}
 ['/usr/bin/g++', '-O0', '-ggdb', '-g3', '-Wall', '-Werror', '-DNS3_ASSERT_ENABLE', '-DNS3_LOG_ENABLE', '-DHAVE___UINT128_T=1', '-DINT64X64_USE_128=1', '-DHAVE_STDINT_H=1', '-DHAVE_INTTYPES_H=1', '../test.cpp', '-c', '-o', 'test.cpp.1.o']
 
 not found
@@ -488,7 +488,7 @@ from /home/rich/ns-3-allinone/ns-3-lb-48/src/core: Test does not build: Tracebac
     raise Errors.BuildError(self.producer.error)
 BuildError: Build failed
  -> task in 'testprog' failed (exit status 1): 
-	{task 139705016959760: cxx test.cpp -> test.cpp.1.o}
+	{task 139900347503376: cxx test.cpp -> test.cpp.1.o}
 ['/usr/bin/g++', '-O0', '-ggdb', '-g3', '-Wall', '-Werror', '-DNS3_ASSERT_ENABLE', '-DNS3_LOG_ENABLE', '-DHAVE___UINT128_T=1', '-DINT64X64_USE_128=1', '-DHAVE_SYS_TYPES_H=1', '-DHAVE_SYS_STAT_H=1', '-DHAVE_DIRENT_H=1', '-DHAVE_STDLIB_H=1', '-DHAVE_GETENV=1', '-DHAVE_SIGNAL_H=1', '-DHAVE_PTHREAD_H=1', '-DHAVE_STDINT_H=1', '-DHAVE_INTTYPES_H=1', '../test.cpp', '-c', '-o', 'test.cpp.1.o']
 
 not found
@@ -611,7 +611,7 @@ from /home/rich/ns-3-allinone/ns-3-lb-48/src/stats: Test does not build: Traceba
     raise Errors.BuildError(self.producer.error)
 BuildError: Build failed
  -> task in 'testprog' failed (exit status 1): 
-	{task 139705016970704: cxxprogram test.cpp.1.o -> testprog}
+	{task 139900347514320: cxxprogram test.cpp.1.o -> testprog}
 ['/usr/bin/g++', 'test.cpp.1.o', '-o', '/home/rich/ns-3-allinone/ns-3-lb-48/build/.conf_check_39b3cecfac3989b2ed760243cef109e6/testbuild/testprog', '-Wl,-Bstatic', '-Wl,-Bdynamic', '-lsqlite3']
 
 not found
