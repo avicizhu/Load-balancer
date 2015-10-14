@@ -1,0 +1,8 @@
+1.src/network/utils/inet-socket-address.h 
+private: Address InetSocketAddress::ConvertTo (void) const  -> public:
+2.src/applications/model/udp-echo-server.cc/  
+adding judging packet content process and send status back to LB
+3.src/internet/model/ipv4-nat.cc
+adding LB packets forwarding mechanism
+4.src/applications/model/packet-sink.cc 
+sending working sockets number aka. the conn number to LB 
